@@ -1,13 +1,26 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class CartPage {
-  readonly removeButtons: Locator;
-  readonly continueShoppingButton: Locator;
-  readonly checkoutButton: Locator;
+  private page: Page;
+  cartItems: Locator;
+  continueShoppingBtn: Locator;
+  checkoutBtn: Locator;
 
-  constructor(private readonly page: Page) {
-    this.removeButtons = page.locator('button[id^="remove-"]');
-    this.continueShoppingButton = page.locator('#continue-shopping');
-    this.checkoutButton = page.locator('#checkout');
+  constructor(page: Page) {
+    this.page = page;
+    this.cartItems = page.locator('.cart_item');
+    this.continueShoppingBtn = page.locator('#continue-shopping');
+    this.checkoutBtn = page.locator('#checkout');
+  }
+
+  async removeFirstItem() {
+    const removeBtn = this.page.locator('button[id^="remove-"]').first();
+    await expect(removeBtn).toBeVisible();
+    await removeBtn.click();
+  }
+
+  async proceedToCheckout() {
+    await expect(this.checkoutBtn).toBeVisible();
+    await this.checkoutBtn.click();
   }
 }
