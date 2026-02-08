@@ -1,27 +1,33 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from './LoginPage';
-import { InventoryPage } from './InventoryPage';
-import { ProductPage } from './ProductPage';
-import { CartPage } from './CartPage';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
+import { ProductPage } from '../pages/ProductPage';
+import { CartPage } from '../pages/CartPage';
 
-test('add products to cart', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const inventoryPage = new InventoryPage(page);
-  const productPage = new ProductPage(page);
-  const cartPage = new CartPage(page);
+test.describe('Cart flow', () => {
 
-  await loginPage.login('standard_user', 'secret_sauce');
-  await expect(page).toHaveURL(/inventory/);
+  test('user can add multiple products to cart', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    const inventoryPage = new InventoryPage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
 
-  await inventoryPage.openProduct(0);
-  await productPage.addToCart();
-  await inventoryPage.goBackToProducts();
+    await loginPage.navigate();
+    await loginPage.login('standard_user', 'secret_sauce');
 
-  await inventoryPage.openProduct(1);
-  await productPage.addToCart();
-  await productPage.viewCart();
+    await expect(page).toHaveURL(/inventory/);
 
-  await expect(cartPage.removeButtons).toHaveCount(2);
-  await expect(cartPage.continueShoppingButton).toBeVisible();
-  await expect(cartPage.checkoutButton).toBeVisible();
+    await inventoryPage.openProductByIndex(0);
+    await productPage.addProductToCart();
+    await inventoryPage.returnToInventory();
+
+    await inventoryPage.openProductByIndex(1);
+    await productPage.addProductToCart();
+    await productPage.openCart();
+
+    await expect(cartPage.cartItems).toHaveCount(2);
+    await expect(cartPage.checkoutButton).toBeVisible();
+    await expect(cartPage.continueShoppingButton).toBeVisible();
+  });
+
 });
