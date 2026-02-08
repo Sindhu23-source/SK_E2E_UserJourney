@@ -1,19 +1,23 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class ProductPage {
-  private readonly addToCartButton: Locator;
-  private readonly cartLink: Locator;
+  private page: Page;
+  private addToCartBtn: Locator;
+  private cartIcon: Locator;
 
-  constructor(private readonly page: Page) {
-    this.addToCartButton = page.locator('button[id^="add-to-cart"]');
-    this.cartLink = page.locator('.shopping_cart_link');
+  constructor(page: Page) {
+    this.page = page;
+    this.addToCartBtn = page.locator('button[id^="add-to-cart"]');
+    this.cartIcon = page.locator('.shopping_cart_link');
   }
 
-  async addToCart() {
-    await this.addToCartButton.click();
+  async addProductToCart() {
+    await expect(this.addToCartBtn).toBeVisible();
+    await this.addToCartBtn.first().click();
   }
 
-  async viewCart() {
-    await this.cartLink.click();
+  async openCart() {
+    await expect(this.cartIcon).toBeVisible();
+    await this.cartIcon.click();
   }
 }
